@@ -1,0 +1,18 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the container name is "server".
+services:
+  server:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+    ports:
+      - 5000:5000
+    volumes:
+      - ./jobs.db:/usr/src/app/jobs.db
+
+# The storage is a local SQLite database file, so we mount it as a volume
+# to ensure data persistence between container restarts.

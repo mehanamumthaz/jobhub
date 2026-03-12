@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHub | Professional Career Ecosystem</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="glow-mesh">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <!-- 1. Landing / Auth Page -->
+    <div id="auth-screen" class="vh-center">
+        <div class="glass-card auth-card">
+            <div class="brand-large">
+                <i class="fas fa-rocket"></i>
+                <h1>Job<span>Hub</span></h1>
+            </div>
+
+            <div id="login-form">
+                <h2>Welcome Back</h2>
+                <p>Login to your professional portal</p>
+                <div class="quick-login-group">
+                    <button onclick="autoLogin('student')" class="btn-quick student">🚀 Auto-Login as Student</button>
+                    <button onclick="autoLogin('company')" class="btn-quick company">🏢 Auto-Login as Company</button>
+                </div>
+                <div class="divider"><span>OR</span></div>
+                <input type="email" id="login-email" placeholder="Email Address">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button onclick="handleLogin()" class="btn-primary-glow">Login</button>
+                <div class="role-selection-hint">
+                    <p>Enter your credentials to access your specific portal.</p>
+                </div>
+                <p class="toggle-auth">Don't have an account? <span onclick="toggleAuth()">Register</span></p>
+            </div>
+
+            <div id="register-form" style="display: none;">
+                <h2>Create Account</h2>
+                <p>Join the career ecosystem</p>
+                <input type="email" id="reg-email" placeholder="Email Address">
+                <input type="password" id="reg-pass" placeholder="Password">
+                <select id="reg-role" onchange="toggleRegFields()">
+                    <option value="student">Register as Student</option>
+                    <option value="company">Register as Company</option>
+                </select>
+
+                <!-- Company specific fields -->
+                <div id="company-reg-fields" style="display: none;">
+                    <input type="text" id="reg-company-name" placeholder="Company Name">
+                    <input type="text" id="reg-location" placeholder="City, Country">
+                    <input type="text" id="reg-industry" placeholder="Industry (e.g. Fintech, AI)">
+                </div>
+
+                <button onclick="handleRegister()" class="btn-primary-glow">Register</button>
+                <p class="toggle-auth">Already have an account? <span onclick="toggleAuth()">Login</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="main-app" style="display: none;" class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon"><i class="fas fa-rocket"></i></div>
+                    <h1>Job<span>Hub</span></h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="overview">
+                    <i class="fas fa-house-chimney"></i>
+                    <span>Overview</span>
+                </a>
+
+                <!-- Student Module Requirements -->
+                <div class="role-student">
+                    <a href="#" class="nav-item" data-view="job-board">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Job Board</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="my-apps">
+                        <i class="fas fa-list-check"></i>
+                        <span>My Applications</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="tools">
+                        <i class="fas fa-microchip"></i>
+                        <span>Smart Tools</span>
+                    </a>
+                </div>
+
+                <!-- Company Module Requirements -->
+                <div class="role-company" style="display: none;">
+                    <a href="#" class="nav-item" data-view="post-job">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Post Vacancy</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="applicants">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Review Applicants</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card" onclick="handleLogout()">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User" alt="User">
+                    <div class="user-meta">
+                        <span id="user-display-name" class="user-name">Professional</span>
+                        <span id="user-display-role" class="user-status">Logout</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- 4. Search & Filter Bar -->
+            <div class="top-controls">
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Search companies, roles, or statuses..."
+                        onkeyup="handleSearch()">
+                </div>
+            </div>
+
+            <!-- Dashboard Overlays -->
+            <div id="view-overview" class="dashboard-view active">
+                <!-- Shared Header - Titles updated via JS -->
+                <div class="view-header-pro">
+                    <div class="header-left">
+                        <span class="view-badge">COMMAND CENTER</span>
+                        <h1 id="welcome-msg">Professional Overview</h1>
+                        <p id="welcome-subtext">Real-time analytics and tracking for your career ecosystem.</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="stat-pill-sm"
+                            style="background: rgba(59, 130, 246, 0.1); color: var(--primary); border-color: rgba(59, 130, 246, 0.2);">
+                            <i class="fas fa-satellite" style="margin-right: 8px;"></i>
+                            System Uplink Active
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUDENT DASHBOARD SECTION -->
+                <div class="role-student">
+                    <section class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon blue"><i class="fas fa-clock"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Follow-up Timer</span>
+                                <h3 id="follow-up-hint">No pending tasks</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon green"><i class="fas fa-chart-line"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Success Rate</span>
+                                <div class="mini-progress-bg" style="margin-top: 5px;">
+                                    <div id="success-progress" class="mini-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <h3 id="success-text">0%</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon purple"><i class="fas fa-calendar-check"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Interview Prep</span>
+                                <h3 id="prep-countdown">No Upcoming</h3>
+                                <button id="btn-pre-brief" class="btn-primary-glow"
+                                    style="display:none; margin-top:10px; padding:6px 12px; font-size:0.75rem; border-radius: 8px; width: 100%;"
+                                    onclick="switchView('tools')">Briefing Notes</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Career Optimization Tools -->
+
+                    <!-- Resume Performance -->
+                    <div style="margin-top: 40px; margin-bottom: 40px;">
+                        <div class="view-header-pro" style="padding: 0; margin-bottom: 25px; background: none; border: none; box-shadow: none;">
+                            <div class="header-left">
+                                <span class="view-badge">STATISTICS & INSIGHTS</span>
+                                <h1 style="margin: 5px 0; font-size: 2.2rem; font-weight: 800;">Resume Influence Tracker</h1>
+                                <p style="color: var(--text-dim); font-size: 0.95rem;">Analyze which profile versions are capturing the most recruiter interest.</p>
+                            </div>
+                        </div>
+                        <div id="resume-insights-full" class="analytics-grid-full"></div>
+                    </div>
+
+                    <!-- Pending Follow-ups -->
+                    <div class="follow-ups-section" style="margin-top: 30px;">
+                        <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="display:flex; align-items:center; gap:10px;"><i class="fas fa-hourglass-half" style="color:var(--primary);"></i> Pending Follow-ups</h3>
+                            <div id="followup-count-badge" class="action-required-badge">0 ACTION REQUIRED</div>
+                        </div>
+                        <div id="followups-grid" class="followups-grid"></div>
+                    </div>
+                </div>
+
+                <!-- COMPANY DASHBOARD SECTION -->
+                <div class="role-company" style="display: none;">
+                    <section id="company-stats-v2" class="metrics-grid" style="margin-top: 20px;">
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon blue"><i class="fas fa-bullhorn"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Jobs Posted</span>
+                                <h3 id="stat-jobs">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon purple"><i class="fas fa-users"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Total Applicants</span>
+                                <h3 id="stat-apps">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon green"><i class="fas fa-user-check"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Shortlisted</span>
+                                <h3 id="stat-shortlisted">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-card">
+                            <div class="metric-icon yellow"><i class="fas fa-star"></i></div>
+                            <div class="metric-data">
+                                <span class="metric-label">Hired</span>
+                                <h3 id="stat-selected">0</h3>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div style="margin-top: 40px;">
+                        <div class="view-header-pro" style="padding: 0; margin-bottom: 25px; background: none; border: none; box-shadow: none;">
+                            <div class="header-left">
+                                <span class="view-badge">TALENT PIPELINE</span>
+                                <h1 style="margin: 5px 0; font-size: 2.2rem; font-weight: 800;">Recent Applicants</h1>
+                                <p style="color: var(--text-dim); font-size: 0.95rem;">Quick view of the latest candidates applying to your roles.</p>
+                            </div>
+                            <div class="header-right">
+                                <button onclick="switchView('applicants')" class="btn-sec btn-small">View Full Pipeline <i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Match %</th>
+                                        <th>Status</th>
+                                        <th>Applied Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="company-mini-pipeline">
+                                    <!-- Simplified mini pipeline injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card status-feed" style="margin-top: 30px;">
+                    <h3>Recent Activity Feed</h3>
+                    <div id="activity-log">
+                        <p class="empty-hint">Welcome! Start by exploring jobs or posting vacancies.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Student: Job Board -->
+            <div id="view-job-board" class="dashboard-view" style="display: none;">
+                <div class="view-header">
+                    <h2>Marketplace Vacancies</h2>
+                    <p>Host using localhost or basic deployment.</p>
+                </div>
+                <div id="vacancies-grid" class="apps-grid-layout">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Student: Smart Tools -->
+            <div id="view-tools" class="dashboard-view" style="display: none;">
+                <div class="view-header-pro" style="padding: 0; margin-bottom: 25px; background: none; border: none; box-shadow: none;">
+                    <div class="header-left">
+                        <span class="view-badge">AI ANALYTICS ENGINE</span>
+                        <h1 style="margin: 5px 0; font-size: 2.2rem; font-weight: 800;">Career Optimization Tools</h1>
+                        <p style="color: var(--text-dim); font-size: 0.95rem;">Leverage pattern recognition to boost your success probability.</p>
+                    </div>
+                </div>
+                <div class="tools-grid">
+                    <div class="glass-card tool-card">
+                        <h3><i class="fas fa-calculator"></i> Priority Score</h3>
+                        <div class="tool-content">
+                            <label>Select Application (Optional)</label>
+                            <select id="tool-app-selector" onchange="loadPriorityFromSelector()" class="checklist-select" style="margin-bottom: 15px;">
+                                <option value="">-- Generic Calculation --</option>
+                            </select>
+                            <label>Skill Match (1-10)</label>
+                            <input type="number" id="tool-skill" value="5" min="1" max="10">
+                            <label>Interest Level (1-10)</label>
+                            <input type="number" id="tool-interest" value="5" min="1" max="10">
+                            <label>Location Fit (1-10)</label>
+                            <input type="number" id="tool-location" value="5" min="1" max="10">
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button onclick="calcPriorityResult()" class="btn-primary-glow" style="flex: 1;">Calculate</button>
+                                <button id="btn-save-priority" onclick="savePriorityToDB()" class="btn-sec" style="flex: 1; display: none;">Save to DB</button>
+                            </div>
+                            <div id="priority-result" class="tool-result"></div>
+                        </div>
+                    </div>
+                    <div class="glass-card tool-card">
+                        <h3><i class="fas fa-scissors"></i> JD Extractor</h3>
+                        <div class="tool-content">
+                            <label>Associate with Application</label>
+                            <select id="tool-jd-selector" onchange="loadJDFromSelector()" class="checklist-select" style="margin-bottom: 15px;">
+                                <option value="">-- Manual Extraction --</option>
+                            </select>
+                            <textarea id="jd-input" placeholder="Paste Job Description Here..." style="height: 120px;"></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button onclick="extractKeywords()" class="btn-primary-glow" style="flex: 1;">Extract Now</button>
+                                <button id="btn-save-jd" onclick="saveKeywordsToDB()" class="btn-sec" style="flex: 1; display: none;">Save keywords</button>
+                            </div>
+                            <div id="keywords-result" class="tool-result"></div>
+                        </div>
+                    </div>
+                    <div class="glass-card tool-card">
+                        <h3><i class="fas fa-list-check"></i> Interview Readiness</h3>
+                        <p class="tool-subtitle">AI-POWERED PREPARATION STEPS</p>
+                        <label style="font-size: 0.65rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Select Target Role</label>
+                        <select id="checklist-role-selector" onchange="loadRoleChecklist()" class="checklist-select">
+                            <option value="Frontend Developer">Frontend Developer</option>
+                            <option value="Backend Developer">Backend Developer</option>
+                            <option value="Full Stack Developer">Full Stack Developer</option>
+                            <option value="Data Analyst">Data Analyst</option>
+                        </select>
+                        <div id="checklist-progress-container" style="margin-top: 15px; display: none;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px;">
+                                <span id="checklist-progress-label">PREPARATION PROGRESS</span>
+                                <span id="checklist-progress-percent">0%</span>
+                            </div>
+                            <div style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                                <div id="checklist-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); transition: width 0.4s ease;"></div>
+                            </div>
+                        </div>
+                        <div class="checklist-items" id="readiness-list" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Student: My Applications (Manage Records / CRUD) -->
+            <div id="view-my-apps" class="dashboard-view" style="display: none;">
+                <div class="view-header-pro">
+                    <div class="header-left">
+                        <span class="view-badge">RECORD MANAGEMENT</span>
+                        <h1>Application Portfolio</h1>
+                        <p>Comprehensive tracking of your career journey.</p>
+                    </div>
+                    <div class="header-right">
+                        <button onclick="openAddModal()" class="btn-action-primary">
+                            <i class="fas fa-plus-circle"></i> New Entry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Portfolio Stats Row -->
+                <div class="apps-stats-bar">
+                    <div class="app-stat-unit">
+                        <span class="unit-label">TOTAL TRACKED</span>
+                        <h4 id="stat-total-apps">0</h4>
+                    </div>
+                    <div class="app-stat-unit">
+                        <span class="unit-label">ACTIVE PIPELINE</span>
+                        <h4 id="stat-active-apps">0</h4>
+                    </div>
+                    <div class="app-stat-unit">
+                        <span class="unit-label">SHORTLISTED</span>
+                        <h4 id="stat-short-apps" style="color: var(--primary);">0</h4>
+                    </div>
+                    <div class="app-stat-unit">
+                        <span class="unit-label">OFFERS RECEIVED</span>
+                        <h4 id="stat-offer-apps" style="color: #10b981;">0</h4>
+                    </div>
+                </div>
+
+                <!-- Quick Add Application Bar -->
+                <div class="quick-add-bar glass-card">
+                    <div class="bar-label">
+                        <i class="fas fa-bolt"></i>
+                        <span>QUICK ADD</span>
+                    </div>
+                    <div class="bar-inputs">
+                        <input type="text" id="quick-company" placeholder="Company Name">
+                        <input type="text" id="quick-role" placeholder="Position / Role">
+                        <input type="text" id="quick-resume" placeholder="Resume Version">
+                        <button onclick="saveQuickEntry()" class="btn-primary-glow">
+                            <i class="fas fa-plus"></i> Add Now
+                        </button>
+                    </div>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Match</th>
+                                <th>Success Prob</th>
+                                <th>Priority</th>
+                                <th>Date</th>
+                                <th>Resume</th>
+                                <th>Interview</th>
+                                <th>Follow-up</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-apps-table">
+                            <!-- Rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+    <!-- Company: Post Job -->
+    <div id="view-post-job" class="dashboard-view" style="display: none;">
+        <div class="view-header">
+            <h2>Post Vacancy</h2>
+            <p>Add required skills and criteria.</p>
+        </div>
+        <div class="glass-card form-container">
+            <div class="form-grid-2col">
+                <div class="form-col">
+                    <label>Job Title</label>
+                    <input type="text" id="job-title" placeholder="e.g. SDE Intern">
+                    <label>Job Type</label>
+                    <select id="job-type">
+                        <option value="Internship">Internship</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                    </select>
+                    <label>Location Type</label>
+                    <select id="job-loc-type">
+                        <option value="Onsite">Onsite</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                    </select>
+                    <label>Exact Location</label>
+                    <input type="text" id="job-location" placeholder="City or 'N/A'">
+                </div>
+                <div class="form-col">
+                    <label>Salary / Stipend</label>
+                    <input type="text" id="job-salary" placeholder="e.g. $2k/mo or Competitive">
+                    <label>Deadline</label>
+                    <input type="date" id="job-deadline">
+                    <label>Min CGPA (optional)</label>
+                    <input type="number" id="job-cgpa" step="0.1" placeholder="e.g. 7.5">
+                    <label>Required Skills (comma separated)</label>
+                    <input type="text" id="job-skills" placeholder="Java, SQL, React">
+                    <label>Application Portal Link (Direct URL)</label>
+                    <input type="url" id="job-portal-url" placeholder="https://talent.company.com/job/123">
+                </div>
+            </div>
+            <label>Full Job Description</label>
+            <textarea id="job-desc" placeholder="Responsibilities, Eligibility, Selection Process..."></textarea>
+            <button onclick="postJob()" class="btn-primary-glow" style="margin-top: 20px;">Broadcast
+                Vacancy</button>
+        </div>
+    </div>
+
+    <!-- Company: Review Applicants -->
+    <div id="view-applicants" class="dashboard-view" style="display: none;">
+        <div class="view-header">
+            <h2>Review Applicants</h2>
+            <p>View list of students who applied.</p>
+        </div>
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Skills</th>
+                        <th>Match %</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="company-applicants-table">
+                    <!-- Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    </main>
+    </div>
+
+    <!-- Apply Modal — Full Application Portal -->
+    <div id="apply-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 520px;">
+            <!-- Close button -->
+            <button class="modal-close-btn" onclick="closeApplyModal()" title="Close"><i
+                    class="fas fa-times"></i></button>
+
+            <!-- Header -->
+            <span class="apply-section-label" style="margin-bottom: 0.25rem;">JOB APPLICATION PORTAL</span>
+            <h3>Submit Your Application</h3>
+            <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0;">Review the role and choose the best
+                resume version to impress the recruiter.</p>
+
+            <!-- Job Preview Card -->
+            <div class="apply-modal-job-preview">
+                <div class="apply-job-icon"><i class="fas fa-briefcase"></i></div>
+                <div class="apply-job-info">
+                    <h4 id="apply-job-title">Loading...</h4>
+                    <span id="apply-job-meta">Company • Location</span>
+                </div>
+            </div>
+
+            <!-- Resume Selection -->
+            <span class="apply-section-label">Choose Resume Version</span>
+            <label class="resume-option">
+                <input type="radio" name="resume-pick" value="Master CV" checked>
+                <div class="resume-option-label">
+                    <strong>📄 Master CV</strong>
+                    <span>General-purpose — best for most roles</span>
+                </div>
+            </label>
+            <label class="resume-option">
+                <input type="radio" name="resume-pick" value="SDE Specialized">
+                <div class="resume-option-label">
+                    <strong>💻 SDE Specialized</strong>
+                    <span>Technical highlight — ideal for engineering roles</span>
+                </div>
+            </label>
+            <label class="resume-option">
+                <input type="radio" name="resume-pick" value="Analyst Resume">
+                <div class="resume-option-label">
+                    <strong>📊 Analyst Resume</strong>
+                    <span>Data-focused — great for analytics & research</span>
+                </div>
+            </label>
+
+            <!-- Optional Cover Note -->
+            <span class="apply-section-label" style="margin-top: 1rem;">Cover Note <span
+                    style="font-weight:400; text-transform: none; letter-spacing:0; color: var(--text-dim); font-size: 0.75rem;">(optional)</span></span>
+            <textarea id="apply-cover-note" class="cover-note-area"
+                placeholder="Write a brief note to the recruiter (max 300 chars)..." maxlength="300"></textarea>
+
+            <!-- Action Buttons -->
+            <div class="modal-btns">
+                <button id="btn-confirm-portal-apply" class="btn-primary-glow">
+                    <i class="fas fa-paper-plane" style="margin-right: 8px;"></i>Confirm & Submit
+                </button>
+                <button onclick="closeApplyModal()" class="btn-sec">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App CRUD Modal -->
+    <div id="app-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close-btn" onclick="closeModal()" title="Close"><i class="fas fa-times"></i></button>
+            <span class="apply-section-label" style="margin-bottom:0.25rem;">RECORD MANAGEMENT</span>
+            <h3 id="modal-title">Application Record</h3>
+            <div class="form-grid" style="text-align: left; margin-top: 20px;">
+                <label>Company Name</label>
+                <input type="text" id="modal-company" placeholder="e.g. Google">
+                <label>Job Role</label>
+                <input type="text" id="modal-role" placeholder="e.g. Software Engineer">
+                <label>Status</label>
+                <select id="modal-status">
+                    <option value="Applied">🟡 Applied</option>
+                    <option value="Shortlisted">🔵 Shortlisted</option>
+                    <option value="Rejected">🔴 Rejected</option>
+                    <option value="Selected">🟢 Selected</option>
+                </select>
+                <label>Resume Version</label>
+                <input type="text" id="modal-resume" placeholder="e.g. Master V2">
+                <label>Date Applied</label>
+                <input type="date" id="modal-date">
+                <label>Interview Date & Time</label>
+                <input type="datetime-local" id="modal-interview-date">
+
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-glass);">
+                    <label style="color: var(--primary); font-size: 0.75rem; letter-spacing: 1px;">FOLLOW-UP
+                        REMINDER</label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.7rem; opacity: 0.7;">Days Offset</label>
+                            <input type="number" id="modal-followup-days" placeholder="e.g. 7">
+                        </div>
+                        <span style="font-size: 0.7rem; margin-top: 20px;">OR</span>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.7rem; opacity: 0.7;">Custom Date</label>
+                            <input type="date" id="modal-followup-date">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-btns">
+                <button onclick="saveApplicationRecord()" class="btn-primary-glow">Save Record</button>
+                <button onclick="closeModal()" class="btn-sec">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Follow-up Modal (New Feature) -->
+    <div id="followup-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close-btn" onclick="closeFollowUpModal()" title="Close"><i
+                    class="fas fa-times"></i></button>
+            <span class="apply-section-label" style="margin-bottom:0.25rem;">AUTO EMAIL GENERATOR</span>
+            <h3 id="followup-modal-title">Job Follow-up</h3>
+            <p style="color:var(--text-dim); font-size:0.85rem;">Select a template to generate a professional follow-up
+                email.</p>
+
+            <div class="template-selector" style="margin-top:20px; display:flex; gap:10px;">
+                <button onclick="switchFollowUpTemplate('standard')" class="btn-sec btn-small template-btn active"
+                    id="btn-tpl-standard">Standard</button>
+                <button onclick="switchFollowUpTemplate('enthusiastic')" class="btn-sec btn-small template-btn"
+                    id="btn-tpl-enthusiastic">Enthusiastic</button>
+            </div>
+
+            <div class="email-preview-container glass-card"
+                style="margin-top:20px; padding:20px; text-align:left; background: rgba(0,0,0,0.3);">
+                <pre id="email-template-content"
+                    style="white-space: pre-wrap; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem; line-height: 1.6; color: rgba(255,255,255,0.9);"></pre>
+            </div>
+
+            <div class="modal-btns" style="margin-top:25px;">
+                <button onclick="copyFollowUpEmail()" class="btn-primary-glow"><i class="fas fa-copy"
+                        style="margin-right:8px;"></i> Copy to Clipboard</button>
+                <button onclick="closeFollowUpModal()" class="btn-sec">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="script.js"></script>
+    <!-- JD Viewer Modal -->
+    <div id="jd-viewer-modal" class="modal-overlay">
+        <div class="modal-content glass-card" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="jd-viewer-title">Job Description</h2>
+                <button onclick="closeJDModal()" class="close-btn">&times;</button>
+            </div>
+            <div id="jd-viewer-body"
+                style="max-height: 450px; overflow-y: auto; padding: 20px; line-height: 1.6; font-size: 0.95rem; color: var(--text-dim); white-space: pre-wrap;">
+                <!-- Content injected here -->
+            </div>
+            <div class="modal-btns">
+                <button onclick="closeJDModal()" class="btn-sec">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
